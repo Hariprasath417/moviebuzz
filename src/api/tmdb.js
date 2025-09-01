@@ -1,13 +1,14 @@
 // src/api/tmdb.js
 
+// --- TMDB Config ---
 const TMDB_API_KEY = process.env.REACT_APP_TMDB_API_KEY;
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
-const BACKEND_URL = "http://localhost:5000";
-// const BACKEND_URL = "https://moviebuzz-backend.onrender.com";
+
+// Change this to your backend deployment URL
+const BACKEND_URL = "https://moviebuzz-backend-2.onrender.com";
 
 // --- TMDB API Functions ---
-
 export const getPopularMovies = async () => {
     const response = await fetch(`${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}`);
     if (!response.ok) throw new Error("Failed to fetch popular movies.");
@@ -30,17 +31,19 @@ export const getMovieById = async (movieId) => {
     return formatMovie(data);
 };
 
+// Helper function to shape movie data
 const formatMovie = (movie) => ({
     id: movie.id.toString(),
     title: movie.title,
     year: movie.release_date ? movie.release_date.substring(0, 4) : 'N/A',
-    posterUrl: movie.poster_path ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` : 'https://placehold.co/500x750/2d3748/ffffff?text=No+Image',
+    posterUrl: movie.poster_path 
+        ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` 
+        : 'https://placehold.co/500x750/2d3748/ffffff?text=No+Image',
     synopsis: movie.overview,
     director: movie.credits?.crew?.find(c => c.job === 'Director')?.name || 'N/A',
 });
 
-// --- Backend API Functions ---
-
+// --- Backend API Helper ---
 const fetchOptions = (method = 'GET', body = null) => {
     const options = {
         method,
@@ -52,9 +55,9 @@ const fetchOptions = (method = 'GET', body = null) => {
     return options;
 };
 
-
+// --- Backend API Functions ---
 export const api = {
-    // Auth
+    // ---------- AUTH ----------
     login: async (email, password) => {
         const response = await fetch(`${BACKEND_URL}/api/auth/login`, fetchOptions('POST', { email, password }));
         const data = await response.json();
@@ -68,12 +71,11 @@ export const api = {
         return data;
     },
 
-    // Reviews
+    // ---------- REVIEWS ----------
     getReviewsForMovie: async (movieId) => {
         const response = await fetch(`${BACKEND_URL}/api/reviews/${movieId}`);
         return response.json();
     },
-    // ** NEW FUNCTION ADDED HERE **
     getUserReviews: async (userId) => {
         const response = await fetch(`${BACKEND_URL}/api/user/${userId}/reviews`);
         return response.json();
@@ -83,7 +85,7 @@ export const api = {
         return response.json();
     },
 
-    // User Interactions
+    // ---------- USER INTERACTIONS ----------
     getUserInteractions: async (userId) => {
         const response = await fetch(`${BACKEND_URL}/api/user/${userId}/interactions`);
         return response.json();
@@ -95,15 +97,16 @@ export const api = {
         await fetch(`${BACKEND_URL}/api/user/${userId}/watchlist/toggle`, fetchOptions('POST', { movieId }));
     },
 
-    // Diary
+    // ---------- DIARY ----------
     getDiary: async (userId) => {
         const response = await fetch(`${BACKEND_URL}/api/user/${userId}/diary`);
         return response.json();
     },
     addDiaryEntry: async (userId, entryData) => {
-        // 3. Third log: Right before the fetch call is sent to the backend
+        // Log for debugging
         console.log(`tmdb.js: Sending POST request to ${BACKEND_URL}/api/user/${userId}/diary with payload:`, entryData);
 
+        // If diary includes review/rating → also add to reviews collection
         if (entryData.rating > 0 || entryData.reviewText) {
             await api.addReview({
                 ...entryData,
@@ -111,8 +114,8 @@ export const api = {
                 username: entryData.username,
             });
         }
+
         const response = await fetch(`${BACKEND_URL}/api/user/${userId}/diary`, fetchOptions('POST', entryData));
         return response.json();
     }
 };
-
