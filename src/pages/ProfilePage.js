@@ -56,16 +56,28 @@ const ProfilePage = () => {
         return <Navigate to="/auth" />;
     }
 
+    if (loading) {
+        return <div className="p-8 text-white text-center">Loading profile...</div>;
+    }
+
     return (
         <div className="p-8 text-white max-w-5xl mx-auto">
             <h1 className="text-4xl font-bold text-center">Profile</h1>
 
             <div className="mt-8 bg-gray-800 p-6 rounded-lg">
                 <p className="text-lg">
-                    <span className="font-semibold text-gray-400">Username:</span> {user.email.split('@')[0]}
+                    <span className="font-semibold text-gray-400">Username:</span>{" "}
+                    {profileData?.username || user.email.split('@')[0]}
                 </p>
                 <p className="text-lg mt-2">
-                    <span className="font-semibold text-gray-400">Email:</span> {user.email}
+                    <span className="font-semibold text-gray-400">Email:</span>{" "}
+                    {profileData?.email || user.email}
+                </p>
+                <p className="text-lg mt-2">
+                    <span className="font-semibold text-gray-400">Joined:</span>{" "}
+                    {profileData?.createdAt
+                        ? new Date(profileData.createdAt).toLocaleDateString()
+                        : "N/A"}
                 </p>
             </div>
 

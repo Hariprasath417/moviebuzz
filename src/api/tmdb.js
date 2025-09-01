@@ -53,11 +53,15 @@ export const getMovieById = async (movieId) => {
     return formatMovie(data);
 };
 
+// Helper function to shape movie data
+// Helper function to shape movie data
 const formatMovie = (movie) => ({
     id: movie.id.toString(),
     title: movie.title,
     year: movie.release_date ? movie.release_date.substring(0, 4) : 'N/A',
-    posterUrl: movie.poster_path ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` : 'https://placehold.co/500x750/2d3748/ffffff?text=No+Image',
+    posterUrl: movie.poster_path 
+        ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` 
+        : 'https://placehold.co/500x750/2d3748/ffffff?text=No+Image',
     synopsis: movie.overview,
     director: movie.credits?.crew?.find(c => c.job === 'Director')?.name || 'N/A',
     genre_ids: movie.genre_ids || [],
