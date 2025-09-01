@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import HomePage from './pages/HomePage';
 import Navbar from './components/Navbar';
 import FilmsPage from './pages/FilmsPage';
 import MovieDetailPage from './pages/MovieDetailPage';
@@ -17,7 +18,8 @@ function App() {
         <Navbar />
         <main className="pt-16">
           <Routes>
-            <Route path="/" element={<FilmsPage />} />
+            <Route path="/" element={<HomePage />} />
+            {/* <Route path="/" element={<FilmsPage />} /> */}
             <Route path="/films" element={<FilmsPage />} />
             <Route path="/film/:id" element={<MovieDetailPage />} />
             <Route path="/auth" element={<AuthPage />} />
